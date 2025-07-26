@@ -12,7 +12,11 @@ let authSlice = createSlice({
       state.loggedIn = action.payload; // عشانها قيمة بولين
     },
     setUserInfo(state, action) {
-      state.user = action.payload;
+      state.user = {
+        name: action.payload.name,
+        email: action.payload.email,
+        id: action.payload.id,
+      };
     },
   },
 });

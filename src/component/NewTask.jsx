@@ -1,24 +1,38 @@
 import { Fragment, useContext, useRef, useState } from "react";
 import { Nav } from "./NavDash";
 import { Navigate, Outlet } from "react-router-dom";
-import { TaskContext } from "../context/TaskContext";
 import Task from "../Modules/Task";
+import TaskapiControler from "../Controller/Task-api-controller";
+import { tasksAction } from "./redux/slice/task-slice";
+import { useDispatch, useSelector } from "react-redux";
 
 export const NewTask = () => {
-  let taskContext = useContext(TaskContext);
-
+  const taskApi = new TaskapiControler();
+  const dispatch = useDispatch();
   let namelRef = useRef();
   let CategoryRef = useRef();
   let DetailsRef = useRef();
   let StartDatRef = useRef();
   let EndDatRef = useRef();
+  let ImageRef = useRef();
+
+  const tasks = useSelector((state) => state.taskReducer.task);
   let cheackData = () => {
+    console.log("🧪 Values:");
+    console.log("Name:", namelRef.current.value);
+    console.log("Category:", CategoryRef.current.value);
+    console.log("Details:", DetailsRef.current.value);
+    console.log("Start Date:", StartDatRef.current.value);
+    console.log("End Date:", EndDatRef.current.value);
+    console.log("Image File:", ImageRef.current.files[0]);
+
     if (
       namelRef.current.value !== "" &&
       CategoryRef.current.value !== "" &&
       DetailsRef.current.value !== "" &&
       StartDatRef.current.value !== "" &&
-      EndDatRef.current.value !== ""
+      EndDatRef.current.value !== "" &&
+      ImageRef.current.files.length > 0
     ) {
       return true;
     } else {
@@ -26,15 +40,20 @@ export const NewTask = () => {
     }
   };
 
+  const categories = useSelector((state) => state.categoriesReducer.categories);
+
   let newTask = () => {
-    return new Task(
-      namelRef.current.value,
-      CategoryRef.current.value,
-      DetailsRef.current.value,
-      StartDatRef.current.value,
-      EndDatRef.current.value,
-      "Waiting"
-    );
+    let task = new Task();
+    task.name = namelRef.current.value; // name
+    task.slug = CategoryRef.current.value; // slug (category)
+    task.image = ImageRef.current.files[0].name; // ✅ اسم الصورة فقط
+    task.id = Date.now().toString(); // ✅ حفظ ID
+    Date.now().toString(); // id
+    task.createdAt = StartDatRef.current.value; // createdAt
+    task.updatedAt = EndDatRef.current.value; // updatedAt
+    task.status = "Waiting"; // status
+    task.Details = DetailsRef.current.value; // Details;
+    return task;
   };
 
   let clear = () => {
@@ -44,26 +63,59 @@ export const NewTask = () => {
     StartDatRef.current.value = "";
     EndDatRef.current.value = "";
   };
+  // let createTask = async () => {
+  //   const Task = newTask();
+  //   console.log("🚀 Task to be created:", Task);
+  //   let response = await taskApi.createTask(Task);
+  //   // dispatch(tasksAction.addNewTask({ ...Task }));
+  //   dispatch(
+  //     tasksAction.addNewTask({
+  //       name: Task.name,
+  //       slug: Task.slug,
+  //       image: Task.image,
+  //       id: Task.id,
+  //       createdAt: Task.createdAt,
+  //       updatedAt: Task.updatedAt,
+  //       status: Task.status,
+  //       Details: Task.Details,
+  //     })
+  //   );
+  //   if (response.status) {
+  //     alert("Task Added Successfully ✅");
+
+  //     // dispatch Redux action if needed here
+
+  //     clear();
+  //   } else {
+  //     alert(response.message || "Something went wrong ❌");
+  //   }
+  // };
   let createTask = async () => {
     const Task = newTask();
-    console.log(Task);
-    let response = await taskContext.apiControler.createTask(Task);
-    if (response) {
-      alert("Task Added Successfully ✅");
-    }
+    console.log("🚀 Task to be created:", Task);
+
+    let response = await taskApi.createTask(Task);
+    console.log(ImageRef.current.files[0]);
     if (response.status) {
-      taskContext.setTask((prevTask) => {
-        return [Task, ...prevTask];
-      });
+      // إذا تم إنشاء الـ task بنجاح، خذ البيانات من response وادفعها للـ Redux
+      dispatch(tasksAction.addNewTask(response.data)); 
+
+      alert("Task Added Successfully ✅");
+      clear();
     } else {
-      alert(response.message);
+      alert(response.message || "Something went wrong ❌");
     }
-    clear();
   };
+
   let SaveTaskHandeller = (event) => {
     event.preventDefault();
+    console.log("Saving..."); // ✅ اختبار
+    console.log("🧪 ImageRef", ImageRef.current.files);
+
     if (cheackData()) {
       createTask();
+    } else {
+      alert("يرجى تعبئة جميع الحقول!");
     }
   };
 
@@ -97,21 +149,41 @@ export const NewTask = () => {
 
             <div className="col-md-12">
               <div className="form-outline mb-4">
-                <label className="form-label">Brand Category</label>
+                <label className="from-label">Brand Category</label>
                 <input
-                  id="input-tags"
-                  value="category 1,category 2, category 3 , name of category"
-                  autoComplete="off"
-                  placeholder="Add Category?"
+                  type="text"
+                  id="loginName"
+                  className="form-control"
+                  placeholder="Task name"
                   ref={CategoryRef}
                 />
+                {/* <select
+                  className="form-control"
+                  ref={CategoryRef}
+                  defaultValue=""
+                >
+                  <option value="" disabled>
+                    Filter By Category
+                  </option>
+
+                  {categories.map((element) => (
+                    <option key={element.id} value={element.slug}>
+                      {element.name}
+                    </option>
+                  ))}
+                </select> */}
               </div>
             </div>
 
             <div className="col-md-12">
               <div className="form-outline mb-4">
                 <label className="form-label">Image For Brands</label>
-                <input className="form-control" type="file" id="formFile" />
+                <input
+                  className="form-control"
+                  type="file"
+                  id="formFile"
+                  ref={ImageRef}
+                />
               </div>
             </div>
 

@@ -2,10 +2,11 @@ import { useContext, useRef } from "react";
 import SocialMediaBar from "./SocialMediaBar";
 import { useNavigate } from "react-router-dom";
 import AuthApiController from "../Controller/auth-api-controller";
-import { AuthContext } from "../context/auth-Contect";
+import { useDispatch } from "react-redux";
+import { authAction } from "./redux/slice/auth-slice";
 
 export const RegisterTap = () => {
-  let auth = useContext(AuthContext);
+const dispatch = useDispatch();
 
   let Navigate = useNavigate();
   let authController = new AuthApiController();
@@ -42,12 +43,14 @@ export const RegisterTap = () => {
       nameRef.current.value,
       emailRef.current.value,
       PasswordRef.current.value,
-      passwordConfirmRef
+      passwordConfirmRef.current.value
     );
     console.log(result);
     alert(result.message);
     if (result.status) {
-      auth.UpdateStatus(true);
+      dispatch(authAction.setLoggedIn(true));
+      dispatch(authAction.setUserInfo(result.user));
+
       clear();
       Navigate("/login");
     } else {

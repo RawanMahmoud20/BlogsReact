@@ -8,6 +8,9 @@ reducers: {
     setCategories(state, action) {
     state.categories = action.payload;
     },
+    getCategories(state, action) {
+        state.categories = action.payload;
+        },
 },
 });
 export const categoriesReducer = categoriesSlice.reducer;

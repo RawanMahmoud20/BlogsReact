@@ -1,34 +1,49 @@
-import { Fragment, useContext, useEffect } from "react";
+import { Fragment, useContext, useEffect, useRef } from "react";
 import { Card } from "./CardImg";
 import { Nav } from "./NavDash";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Navigate, Outlet, replace, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import TaskapiControler from "../Controller/Task-api-controller";
 import { useDispatch, useSelector } from "react-redux";
 import { tasksAction } from "./redux/slice/task-slice";
+import { authAction } from "./redux/slice/auth-slice";
+import { NavLink } from "react-router-dom";
 
 export const Tasks = () => {
   let dispatch = useDispatch();
   let tasks = useSelector((state) => state.taskReducer.filteredTask);
+
   let categories = useSelector((state) => state.categoriesReducer.categories);
   let api = new TaskapiControler();
-  // let [FilteredTask, SetFilteredTask] = useState([]);
+  let navigate = useNavigate();
   let OnFilteredHandeller = (event) => {
-    if (event.target.value !== "All") {
-      // let task = FilteredTask.filter(
-      //   (element) => element.status.trim() === event.target.value
-      // );
-      // SetFilteredTask(task);
+    if (event.target.value == "All") {
+      dispatch(tasksAction.filterTasksByStatus(event.target.value));
     } else {
-      // SetFilteredTask(FilteredTask.result.data);
+      console.log("All");
+      dispatch(tasksAction.filterTasksByStatus(event.target.value));
     }
+  };
+  let searchRef = useRef();
+
+  let SearchCheakHandeller = (event) => {
+    console.log(event.target.value);
+    console.log("Search changed!");
+    dispatch(tasksAction.filteredTasksByName(event.target.value));
   };
   useEffect(() => {
     const fetchData = async () => {
       let response = await api.FilteredTask();
       console.log("Tasks fetched:", response);
-      if (Array.isArray(response) && response.length !== 0) {
-        dispatch(tasksAction.setTask(response));
+      if (response?.tasks && Array.isArray(response.tasks)) {
+        dispatch(tasksAction.setTask(response.tasks));
+      } else if (response.status === 401) {
+        dispatch(authAction.setLoggedIn(false));
+        dispatch(tasksAction.setTask(response.data)); // أو حسب اسم الأكشن
+
+        navigate("/login", { replace: true });
+      } else {
+        console.log("⚠️ Unexpected response shape:", response);
       }
     };
     fetchData();
@@ -40,7 +55,7 @@ export const Tasks = () => {
     <Fragment>
       <header className="navbar sticky-top navbar-light bg-light flex-md-nowrap p-0 shadow">
         <a className="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">
-         The Brands
+          The Brands
         </a>
         <button
           className="navbar-toggler position-absolute d-md-none collapsed"
@@ -58,16 +73,14 @@ export const Tasks = () => {
           type="text"
           placeholder="Search"
           aria-label="Search"
+          ref={searchRef}
+          onChange={SearchCheakHandeller}
         />
         <div className="navbar-nav">
           <div className="nav-item text-nowrap">
-            {/* <NavLink to="/login" className="nav-link px-3 btn-light-main btn">
+            <NavLink to="/login" className="nav-link px-3 btn-light-main btn">
               Sign out
-            </NavLink> */}
-            <button className="nav-link px-3 btn-light-main btn">
-              Sign out
-              {/* <Navigate to="/login" /> */}
-            </button>
+            </NavLink>
           </div>
         </div>
       </header>

@@ -2,18 +2,32 @@ import { Fragment, useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Nav } from "./NavDash";
 import { TaskContext } from "../context/TaskContext";
-// import { First } from "../resourse/img/1.png";
+import { tasksAction } from "./redux/slice/task-slice.js"; // تأكدي من المسار الصحيح
+
+import { useDispatch, useSelector } from "react-redux";
+import TaskapiControler from "../Controller/Task-api-controller";
 export const TaskDetails = () => {
-  let taskContext = useContext(TaskContext);
+  let dispatch = useDispatch();
+  let api = new TaskapiControler();
+
+  const tasks = useSelector((state) => state.taskReducer.task);
   let params = useParams();
-  const [task, setTask] = useState([]);
+  const [task, setTask] = useState(null);
 
   useEffect(() => {
-    // لما يفتح الصفحة، جلب المهمة المناسبة حسب id
-    setTask(
-      taskContext.task.find((element) => element.id.toString() === params.id)
-    );
-  }, [params.id, taskContext.task]);
+    const fetchIfNeeded = async () => {
+      if (tasks.length === 0) {
+        const fetchedTasks = await api.FilteredTask();
+        dispatch(tasksAction.setTask(fetchedTasks));
+      }
+    };
+    fetchIfNeeded();
+  }, []);
+
+  useEffect(() => {
+    const selectedTask = tasks.find((element) => element.id === params.id);
+    setTask(selectedTask || null);
+  }, [params.id, tasks]);
 
   let changeTaskStatus = (newStatus) => {
     let updateTask = task;
@@ -21,12 +35,43 @@ export const TaskDetails = () => {
     setTask({ ...updateTask });
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      //  نجيبه من redux أولاً
+      const found = tasks.find(
+        (element) => element.id.toString() === params.id
+      );
+      if (found) {
+        setTask(found);
+      } else {
+        // إذا مش موجود،  من API مباشرة
+        const fetchedTask = await api.getTaskById(params.id);
+        setTask(fetchedTask);
+        dispatch(tasksAction.addNewTask(fetchedTask));
+      }
+    };
+    fetchData();
+  }, [params.id, tasks]);
+  //  عرض loading إذا المهمة مش موجودة بعد
+  if (!task) {
+    return (
+      <Fragment>
+        <Nav />
+        <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+          <h3 className="mt-5">Loading task details...</h3>
+        </main>
+      </Fragment>
+    );
+  }
+
+  //  إذا المهمة موجودة، نعرض التفاصيل
+
   return (
     <Fragment>
       <Nav />
       <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-          <h1 className="h2"> task {params.id}</h1>
+          <h1 className="h2"> Brand {params.id}</h1>
 
           <div className=" mb-2 mb-md-0">
             <div className="d-flex align-items-center ms-3 ms-lg-4"></div>
@@ -80,7 +125,13 @@ export const TaskDetails = () => {
 
         <div className="row mt-5">
           <div className="col-md-6">
-            <img src="img/1.png" className="img-fluid rounded de-img" alt="" />
+            {task.image && (
+              <img
+                src={task.image}
+                className="img-fluid rounded de-img"
+                alt="task"
+              />
+            )}{" "}
           </div>
           <div className="col-md-6  mt-5">
             <div className=" mb-3">
@@ -89,12 +140,12 @@ export const TaskDetails = () => {
             </div>
             <div className="mb-3">
               <span data-feather="layers" className="main-color"></span>{" "}
-              <strong>Category:</strong> {task.Category}
+              <strong>Category:</strong> {task.slug}
             </div>
             <div className="">
               <span data-feather="calendar" className="main-color"></span>{" "}
               <strong>Date:</strong>
-              {task.StartDat} to{task.EndDa}
+              {task.createdAt} to{task.updatedAt}
             </div>
           </div>
 

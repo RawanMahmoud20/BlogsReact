@@ -1,4 +1,4 @@
-import { Fragment, useContext, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useRef, useState } from "react";
 import "bootstrap/dist/js/bootstrap.js";
 
 import "../resourse/css/dashboard.css";
@@ -11,7 +11,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { authAction } from "../component/redux/slice/auth-slice";
 import axios from "axios";
 import CategoriesApiController from "../Controller/Categories-api-controller";
-import { categoriesAction , categoriesReducer} from "../component/redux/slice/categories-slice";
+import {
+  categoriesAction,
+  categoriesReducer,
+} from "../component/redux/slice/categories-slice";
+import { tasksAction } from "../component/redux/slice/task-slice";
 
 export const Dashboard = () => {
   // const api = new AuthApiController();
@@ -19,9 +23,9 @@ export const Dashboard = () => {
   let Navigate = useNavigate();
   let authController = new AuthApiController();
   let dispatch = useDispatch();
-  let categories = useSelector((state)=>state.categoriesReducer.categories);
+  let categories = useSelector((state) => state.categoriesReducer.categories);
   const categoriesApicontrol = new CategoriesApiController();
-
+  let searchRef = useRef();
   let buttonHandeller = async () => {
     let response = await authController.logout();
     if (response.status) {
@@ -33,15 +37,21 @@ export const Dashboard = () => {
   };
   let UserInfo = useSelector((state) => state.authReducer.user);
 
-let fetchCategories= async()=>{
-  if(categories.length !==0){
-  let Categories= await categoriesApicontrol.fetchCategories();
-  if(categories.length !==0){
-    dispatch(categoriesAction.setCategories(Categories));
-  }
-}
-}
-
+  let fetchCategories = async () => {
+    if (categories.length !== 0) {
+      let Categories = await categoriesApicontrol.fetchCategories();
+      if (categories.length !== 0) {
+        dispatch(categoriesAction.setCategories(Categories));
+      }
+    }
+  };
+  let SearchCheakHandeller = (event) => {
+    console.log(event.target.value);
+    console.log("Search changed!");
+        dispatch(tasksAction.filteredTasksByName(event.target.value));
+    
+    
+  };
   useEffect(() => {
     const fetchUser = async () => {
       const token = localStorage.getItem("token");
@@ -64,7 +74,7 @@ let fetchCategories= async()=>{
     <Fragment>
       <header className="navbar sticky-top navbar-light bg-light flex-md-nowrap p-0 shadow">
         <a className="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">
-          <h2>مرحباً، {UserInfo.name}</h2>
+          <h2>Hello {UserInfo.name}</h2>
         </a>
         <button
           className="navbar-toggler position-absolute d-md-none collapsed"
@@ -82,6 +92,8 @@ let fetchCategories= async()=>{
           type="text"
           placeholder="Search"
           aria-label="Search"
+          ref={searchRef}
+          onChange={SearchCheakHandeller}
         />
         <div className="navbar-nav">
           <div className="nav-item text-nowrap">

@@ -5,6 +5,12 @@ import Cookies from "js-cookie";
 
 class AuthApiController {
   Api_key = "AIzaSyAFy_smZwukC7xw-f0ofdb_VsHM3DLuoLI";
+  constructor(message, status, token = null, user = null) {
+    this.message = message;
+    this.status = status;
+    this.token = token;
+    this.user = user;
+  }
   performLogin = async (email, password) => {
     axios.defaults.baseURL = "http://localhost:8000";
     axios.defaults.withCredentials = true;
@@ -64,18 +70,15 @@ class AuthApiController {
     try {
       let token = localStorage.getItem("token");
 
-      let response =  await axios.get(`/api/v1/users/${id}`, {
+      let response = await axios.get(`/api/v1/users/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`, // مهم جداً
         },
         withCredentials: true, // لو السيرفر بيشتغل على الكوكي
       });
       if (response.data && response.data.data) {
-        let response=new ApiResponse(
-          "Fetched user successfully!",
-          true,
-        );
-        response.user=response.data;
+        let response = new ApiResponse("Fetched user successfully!", true);
+        response.user = response.data;
         return response;
       }
       return new ApiResponse("User not found", false);
@@ -99,66 +102,79 @@ class AuthApiController {
   //   }
   // };
 
-  preformRegister = async (name, email, password) => {
-    axios.defaults.baseURL = "http://localhost:8000"; // without /api
-    axios.defaults.withCredentials = true; // allow to use cookies
+  preformRegister = async (name, email, password, passwordConfirm) => {
+    axios.defaults.baseURL = "http://localhost:8000";
+    axios.defaults.withCredentials = true;
+
     try {
-      // إرسال طلب تسجيل إلى API
       const response = await axios.post("/api/v1/auth/signup", {
         name,
         email,
         password,
-        passwordConfirm: password,
+        passwordConfirm,
       });
 
-      // التحقق من نجاح العملية ووجود التوكن
+      console.log("✅ Register response:", response.data);
+
       if (response.data && response.data.token) {
         const token = response.data.token;
-        const user = response.data.data; // user data
+        const user = response.data.data;
 
-        // تخزين التوكن مثلاً في localStorage أو state
+        // تخزين التوكن في localStorage
         localStorage.setItem("token", token);
+
         // حفظ بيانات المستخدم في الكوكيز
         Cookies.set("user", JSON.stringify(user), {
-          expires: 7, // الأيام التي يبقى فيها الكوكيز
-          secure: false, // true لو كنت على https
+          expires: 7,
+          secure: false,
           sameSite: "Lax",
         });
 
-        // //✅ للوصول لبيانات المستخدم في أي مكان: {
-        // const user = Cookies.get("user");
-        // const userObj = user ? JSON.parse(user) : null;
-
-        // console.log(userObj?.username); // Rawan مثلاً }
-
-        return new ApiResponse("Registered successfully!", true, token);
+        return new ApiResponse("Registered successfully!", true, token, user);
       } else {
         return new ApiResponse("No token received", false);
       }
     } catch (error) {
-      console.error("Register error:", error); // مهم: يساعدنا نعرف الخطأ الحقيقي
+      if (error.response) {
+        console.error(
+          "❌ Register error - message:",
+          error.response.data.message
+        );
+        console.error(
+          "❌ Register error - validation errors:",
+          error.response.data.errors
+        );
 
-      let errorMessage = "Something went wrong!";
-      if (error.response && error.response.data) {
-        errorMessage =
-          error.response.data.message ||
-          error.response.data.error?.message ||
-          errorMessage;
-      } else if (error.message) {
-        errorMessage = error.message;
+        // عرض الأخطاء بشكل واضح في alert
+        const validationErrors = error.response.data.errors;
+        if (Array.isArray(validationErrors)) {
+          const messages = validationErrors
+            .map((err) => `• ${err.msg}`)
+            .join("\n");
+          alert("Validation Errors:\n" + messages);
+        } else {
+          alert(error.response.data.message || "Something went wrong!");
+        }
+      } else {
+        alert(error.message || "Something went wrong!");
       }
 
-      return new ApiResponse(errorMessage, false);
+      return new ApiResponse(
+        error.response?.data?.message ||
+          error.message ||
+          "Something went wrong!",
+        false
+      );
     }
   };
 
   register = async (name, email, password, passwordConfirm) => {
     axios.defaults.withCredentials = true;
-    axios.defaults.baseURL = "http://localhost:8000/api/v1/auth/signup";
+    axios.defaults.baseURL = "http://localhost:8000";
 
     try {
-      let response = await axios.post(
-        `/api/auth/register`,
+      const response = await axios.post(
+        `/api/v1/auth/signup`,
         {
           name: name,
           email: email,
@@ -171,8 +187,13 @@ class AuthApiController {
           },
         }
       );
-      let apiResponse = new ApiResponse("Registered successfully", true);
-      return apiResponse;
+      const token = response.data.token;
+      if (token) {
+        localStorage.setItem("token", token);
+        return new ApiResponse("Registered successfully", true, token);
+      } else {
+        return new ApiResponse("No token received", false);
+      }
     } catch (error) {
       let errorMessage = "Something went wrong!";
       if (error.response && error.response.data) {
