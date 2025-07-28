@@ -9,7 +9,7 @@ class TaskapiControler {
 
   constructor(token) {
     this.token = localStorage.getItem("token");
-    console.log("🛡️ Loaded token from localStorage:", this.token);
+    // console.log("🛡️ Loaded token from localStorage:", this.token);
   }
   async FilteredTask() {
     axios.defaults.baseURL = "http://localhost:8000/api";
@@ -152,52 +152,31 @@ class TaskapiControler {
   };
 
   EditPhotoBrand = async (id, selectFile) => {
-  console.log("Preparing to upload:", { id, selectFile, token: this.token });
+    console.log("Preparing to upload:", { id, selectFile, token: this.token });
 
-  axios.defaults.baseURL = "http://localhost:8000/api";
-  axios.defaults.withCredentials = true;
+    axios.defaults.baseURL = "http://localhost:8000/api";
+    axios.defaults.withCredentials = true;
 
-  const formData = new FormData();
-  formData.append("image", selectFile); 
-  try {
-    const response = await axios.put(`/v1/brands/${id}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${this.token}`,
-      },
-    });
-    alert("Edit Is Done");
-    return { status: true, data: response.data };
-  } catch (err) {
-    alert("No Edit");
-    console.error("Error uploading image:", err);
-    return { status: false, message: err.message };
-  }
-};
+    const formData = new FormData();
+    formData.append("image", selectFile);
+    try {
+      const token = localStorage.getItem("token");
 
-  // EditPhotoBrand = async (id, selectFile) => {
-  //   axios.defaults.baseURL = "http://localhost:8000/api";
-  //   axios.defaults.withCredentials = true;
-  //   const formData = new FormData();
-  //   formData.append("image", selectFile);
+      const response = await axios.put(`/v1/brands/${id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      alert("Edit Is Done");
+      return { status: true, data: response.data };
+    } catch (err) {
+      alert("No Edit");
+      console.error("Error uploading image:", err);
+      return { status: false, message: err.message };
+    }
+  };
 
-  //   try {
-  //     const response = await axios.put(`/v1/brands/${id}`, formData, {
-  //       headers: {
-  //         // multipart/form-data لأنه في ملف.
-  //         "Content-Type": "multipart/form-data",
-  //         Authorization: `Bearer ${this.token}`,
-  //       },
-  //     });
-  //     alert("Edit Is Done");
-  //     return { status: true, data: response.data };
-  //   } catch (err) {
-  //     alert("No Edit");
-  //     console.error(err);
-  //     return { status: false, message: err.message };
-  //   }
-  // };
-  // delete Brand
   DeleteBrand = async (id) => {
     axios.defaults.baseURL = "http://localhost:8000/api";
     axios.defaults.withCredentials = true;

@@ -23,38 +23,58 @@ export const Card = (props) => {
   const handleEditImage = async (brandId) => {
     const fileInput = document.createElement("input");
     fileInput.type = "file";
+    fileInput.accept = "image/*";
     fileInput.onchange = async () => {
       const selectFile = fileInput.files[0];
       if (!selectFile) return;
+
       const result = await api.EditPhotoBrand(brandId, selectFile);
       if (result.status) {
-        console.log(" Edit success, server image:", result.data.data.image);
+        console.log("Edit success, server image:", result.data.data.image);
 
-        const updatePhotoUrl = result.data.data.image.startsWith("http")
-          ? `${result.data.data.image}?v=${Date.now()}`
-          : `http://localhost:8000/${result.data.data.image}?v=${Date.now()}`;
+        // أضيف v=Date.now() دائماً لتجاوز الكاش حتى لو الرابط ما تغير
+        const baseUrl = result.data.data.image.startsWith("http")
+          ? result.data.data.image
+          : `http://localhost:8000/${result.data.data.image}`;
+
+        const updatedImage = `${baseUrl}?v=${Date.now()}`;
+
+        
+
         dispatch(
           tasksAction.EditPhotoById({
             id: brandId,
-            newImage: updatePhotoUrl,
+            newImage: updatedImage,
           })
         );
-        dispatch(tasksAction.filterTasksByStatus("All")); // مثلا تعيد عرض الكل
+
+        dispatch(tasksAction.filterTasksByStatus("All")); // إعادة تحميل الفلتر
+      } else {
+        alert("Image edit failed");
       }
     };
 
     fileInput.click();
   };
+
   return (
     <div className="col-md-4">
-      <div className="card task">
-        <img
-          src={`${props.task.image}?v=${Date.now()}`} // force cache refresh
+      <div className="card task" key={`${props.task.id}-${props.task.image}`}>
+        {/* <img
+          src={`${props.task.image}?updated=${Date.now()}`}
+          // src={props.task.image}
+          key={`${props.task.id}-${props.task.image}`}
           alt={props.task.name}
           className="card-img-top"
           style={{ height: "200px", objectFit: "cover" }}
-          key={`${props.task.id}-${props.task.image}`} // تغيير المفتاح حسب الصورة لتحديث React
-        />
+        /> */}
+        <img
+           src={props.task.image}
+           alt={props.task.name}
+          className="card-img-top"
+          style={{ height: "200px", objectFit: "cover" }}
+          key={`${props.task.id}-${props.task.image}`} // استخدم الصورة في المفتاح
+          />
         <div className="card-body">
           <h5 className="card-title">{props.task.name}</h5>
           <h6 className="card-subtitle mb-2 text-muted">
@@ -69,14 +89,14 @@ export const Card = (props) => {
             {props.task.status}
           </span>
           <button
-            className=" dropdown form-control pull-right"
+            className="dropdown form-control pull-right"
             style={{ width: "100px" }}
             onClick={() => handleEditImage(props.task.id)}
           >
             Edit Photo
           </button>
           <button
-            className=" dropdown form-control pull-right"
+            className="dropdown form-control pull-right"
             style={{ width: "120px" }}
             onClick={() => handleDeleteBrands(props.task.id)}
           >

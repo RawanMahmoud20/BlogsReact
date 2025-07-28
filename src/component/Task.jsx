@@ -141,8 +141,11 @@ export const Tasks = () => {
             ))} */}
           {console.log("Tasks from Redux:", tasks)}
           {tasks.length === 0 && <p>No tasks to show</p>}
-          {tasks.map((element) => (
-            <Card key={element.id} task={element} />
+          {/* {tasks.map((element) => (
+            <Card key={`${element.id}-${element.image}`} task={element} />
+          ))} */}
+          {tasks.map((task) => (
+            <Card key={`${task.id}-${task.image}`} task={task} />
           ))}
         </div>
       </main>

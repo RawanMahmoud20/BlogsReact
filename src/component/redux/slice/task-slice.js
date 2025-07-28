@@ -41,18 +41,46 @@ let taskSlice = createSlice({
       );
     },
 
+    // EditPhotoById(state, action) {
+    //   const { id, newImage } = action.payload;
+
+    //   // نحدث task مباشرة باستخدام map
+    //   state.task = state.task.map((task) =>
+    //     task.id === id ? { ...task, image: newImage } : task
+    //   );
+
+    //   // نحدث filteredTask بنفس الطريقة لضمان تزامنه مع task
+    //   state.filteredTask = state.filteredTask.map((task) =>
+    //     task.id === id ? { ...task, image: newImage } : task
+    //   );
+    // },
+    // EditPhotoById(state, action) {
+    //   const { id, newImage } = action.payload;
+    //   const taskIndex = state.task.findIndex((t) => t.id === id);
+    //   if (taskIndex !== -1) {
+    //     state.task[taskIndex].image = newImage;
+    //   }
+
+    //   // لو في filteredTask أيضاً:
+    //   const filteredIndex = state.filteredTask.findIndex((t) => t.id === id);
+    //   if (filteredIndex !== -1) {
+    //     state.filteredTask[filteredIndex].image = newImage;
+    //   }
+    // }
     EditPhotoById(state, action) {
       const { id, newImage } = action.payload;
-
-      // نحدث task مباشرة باستخدام map
-      state.task = state.task.map((task) =>
-        task.id === id ? { ...task, image: newImage } : task
-      );
-
-      // نحدث filteredTask بنفس الطريقة لضمان تزامنه مع task
-      state.filteredTask = state.filteredTask.map((task) =>
-        task.id === id ? { ...task, image: newImage } : task
-      );
+      // تنظيف URL من أي معلمات مكررة
+      const cleanUrl = newImage.split("?")[0];
+      const updatedImage = `${cleanUrl}?v=${Date.now()}`;
+      return {
+        ...state, // Copy all existing state properties
+        task: state.task.map((task) =>
+          task.id === id ? { ...task, image: updatedImage } : task
+        ),
+        filteredTask: state.filteredTask.map((task) =>
+          task.id === id ? { ...task, image: updatedImage } : task
+        ),
+      };
     },
   },
 });
