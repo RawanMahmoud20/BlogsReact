@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import "../../../resourse/css/Cms.css";
+ import "../../../resourse/css/Cms.css";
 import NavCms from "../../component/cms/CMSNav";
 import Blogs from "../../../resourse/images/ic_blogs.svg";
 import userAvatar from "../../../resourse/images/user_avatar.svg";
@@ -24,7 +24,7 @@ function CMSParent() {
           <img src={userLogout} alt="" />
         </section>
       </aside>
-      <div className="content-wrapper">
+      <div className="Cms-content-wrapper">
         <header>
           <section>
             <span>Hi</span>

@@ -1,4 +1,8 @@
 import { NavLink } from "react-router-dom";
+import blogs from "../../../resourse/images/ic_blogs.svg";
+import overview from "../../../resourse/images/ic_overview.svg";
+import categories from "../../../resourse/images/ic_categories.svg";
+import settings from "../../../resourse/images/ic_settings.svg";
 
 let NavCms = () => {
   return (
@@ -12,7 +16,7 @@ let NavCms = () => {
             end
           >
             <div className="nav-item-content">
-              <img src="Images/ic_overview.svg" alt="" />
+              <img src={overview} alt="" />
               <span>Overview</span>
             </div>
             <span className="nav-item-count">2</span>
@@ -25,7 +29,7 @@ let NavCms = () => {
             end
           >
             <div className="nav-item-content">
-              <img src="Images/ic_blogs.svg" alt="" />
+              <img src={blogs} alt="" />
               <span>All Blogs</span>
             </div>
             <span className="nav-item-count">2</span>
@@ -38,7 +42,7 @@ let NavCms = () => {
             end
           >
             <div className="nav-item-content">
-              <img src="Images/ic_categories.svg" alt="" />
+              <img src={categories} alt="" />
               <span>Categories</span>
             </div>
             <span className="nav-item-count">2</span>
@@ -51,7 +55,7 @@ let NavCms = () => {
             end
           >
             <div className="nav-item-content">
-              <img src="Images/ic_settings.svg" alt="" />
+              <img src={settings} alt="" />
               <span>Settings</span>
             </div>
             <span className="nav-item-count">2</span>
