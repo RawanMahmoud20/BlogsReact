@@ -1,7 +1,10 @@
 import { NavLink } from "react-router-dom";
 import CategoriesItem from "../../component/cms/CategoriesItem";
+import { useSelector } from "react-redux";
 
 let Categories = () => {
+
+let categories = useSelector((state)=>(state.categories.data));
   return (
     <section class="content">
       <div class="content-header">
@@ -17,11 +20,16 @@ let Categories = () => {
       </div>
       <div class="content-body">
         <section class="all-categories">
-          <CategoriesItem />
-          <CategoriesItem />
-          <CategoriesItem />
-          <CategoriesItem />
-          <CategoriesItem />
+
+          {
+          categories.length >0 
+          ?
+          categories.map((element)=>(
+          <CategoriesItem key={element.id} data={element}/>
+          )) 
+          :
+          <p>No categories found</p>
+          }
         </section>
       </div>
     </section>

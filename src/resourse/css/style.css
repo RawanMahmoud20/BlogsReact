@@ -2,7 +2,7 @@ body{
     margin: 0px;
     font-family: "Poppins", sans-serif;
 }
-header{
+.websiteheader{
     height: 551px;
     background-color: #1d968d;
     color: white;
@@ -11,7 +11,7 @@ header{
     flex-direction: column;
 }
 /* SECTION */
-header> section{
+.websiteheader> section{
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -20,13 +20,13 @@ header> section{
     padding: 51px 100px  0px 100px ;
 
 }
-header > span:first-of-type{
+.websiteheader > span:first-of-type{
     font-size: 0.4em ;      /* بياخذ الخط من اقرب أب اله  */
     font-weight: bold;
 
 }
 
-header >section > nav >ul {
+.websiteheader >section > nav >ul {
     display: flex;
     font-size: calc(0.5em - 5px);
     column-gap: 70px;
@@ -35,7 +35,7 @@ header >section > nav >ul {
     padding: 0px;
     margin: 0px;
 }
-header >section > nav >ul >li >a{
+.websiteheader >section > nav >ul >li >a{
     text-decoration: none;
 
     color: white;
@@ -43,7 +43,7 @@ header >section > nav >ul >li >a{
 .activel-link{
     font-weight: bold;
 }
-header >section >button {
+.websiteheader >section >button {
     background-color: rgba(195, 195, 186, 0.31);
     border: none;
     color: white;
@@ -56,7 +56,7 @@ header >section >button {
     -o-border-radius: 8px;
     font-weight: 500px;
 }
-header > article {
+.websiteheader > article {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -64,7 +64,7 @@ header > article {
     padding-left: 12%;
 }
 
-header > article > span {
+.websiteheader > article > span {
     font-weight: bold;
 }
 /* CONTENT-WRAPPER */

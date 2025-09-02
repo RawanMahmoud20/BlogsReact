@@ -1,11 +1,11 @@
 import { Fragment } from "react";
-import "../../../resourse/css/style.css";
+// import "../../../resourse/css/style.css";
 import { Outlet } from "react-router-dom";
 
 let WebsiteParent = () => {
   return (
     <Fragment>
-      <header>
+      <header className="websiteheader">
         <section>
           <span>BLOGS</span>
           <nav>

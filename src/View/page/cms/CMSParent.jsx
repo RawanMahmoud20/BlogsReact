@@ -25,7 +25,7 @@ function CMSParent() {
         </section>
       </aside>
       <div className="Cms-content-wrapper">
-        <header>
+        <header className="Cmsheader">
           <section>
             <span>Hi</span>
             <span>User Name</span>
