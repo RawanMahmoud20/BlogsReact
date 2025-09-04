@@ -2,6 +2,7 @@ import { useRef } from "react";
 import Blog from "../../../models/Blog";
 import { CategoriesActions } from "../../../redux/slices/categories-slice";
 import { useDispatch } from "react-redux";
+import Category from "../../../models/Category";
 
 let NewCategories = () => {
 
@@ -26,7 +27,7 @@ let cheackData=()=>{
   return false;
 };
 let getObject=()=>{
-return new Blog(
+return new Category(
   Date.now().toString(),
   titleRef.current.value,
   briefInfoRef.current.value,

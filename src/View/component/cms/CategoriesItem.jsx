@@ -18,7 +18,7 @@ let CategoriesItem = (props) => {
   return (
     <article class="category">
       <div class="category-header">
-        <span>{props.data._title}</span>
+        <span>{props.data._name}</span>
         <div class="table-option">
           <img src={Delete} alt="" onClick={OnDelteHandeller}/>
         </div>

@@ -7,19 +7,21 @@ let blogsSlice = createSlice({
 
   reducers: {
    create(state, action) {
-     state.categories.push(action.payload);
+    state.data= [...state.data, action.payload];    
    },
    update(state, action) {
-     const index = state.categories.findIndex(cat => cat.id === action.payload.id);
+     const index = state.data.findIndex(cat => cat.id === action.payload.id);
      if (index !== -1) {
-       state.categories[index] = action.payload;
+       state.data[index] = action.payload;
      }
    },
    delete(state, action) {
-     state.categories = state.categories.filter(cat => cat.id !== action.payload.id);
-   },
+    let filteredData=state.data.filter(
+      (element)=>element._id !== action.payload
+    );
+     state.data = filteredData;   },
    read(state, action) {
-     return state.categories.find(cat => cat.id === action.payload.id);
+     state.data = action.payload;
    },
   },
 });

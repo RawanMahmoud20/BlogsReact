@@ -1,7 +1,9 @@
 import { NavLink } from "react-router-dom";
 import BlogRow from "../../component/cms/BlogTableRow";
+import { useSelector } from "react-redux";
 
 let Blogs = () => {
+  let data= useSelector((state) => state.blogs.data);
   return (
     <section className="content">
       <div className="content-header">
@@ -28,11 +30,14 @@ let Blogs = () => {
               </tr>
             </thead>
             <tbody>
-              <BlogRow />
-              <BlogRow />
-              <BlogRow />
-              <BlogRow />
-            </tbody>
+            {data && data.length > 0 ? (
+              data.map((element) => (
+                <BlogRow key={element.id} blog={element} />
+              ))
+            ) : null }
+          </tbody>
+
+
           </table>
         </div>
       </div>

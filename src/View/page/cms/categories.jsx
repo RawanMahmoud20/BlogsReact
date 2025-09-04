@@ -6,11 +6,11 @@ let Categories = () => {
 
 let categories = useSelector((state)=>(state.categories.data));
   return (
-    <section class="content">
-      <div class="content-header">
+    <section className="content">
+      <div className="content-header">
         <span>All Categories</span>
-        <div class="content-header-options">
-          <div class="content-header-options_filter">
+        <div className="content-header-options">
+          <div className="content-header-options_filter">
             <img src="images/btn_Filter.svg" alt="" />
           </div>
           <NavLink className="header-button" to="/cms/categories/new">
@@ -18,8 +18,8 @@ let categories = useSelector((state)=>(state.categories.data));
           </NavLink>
         </div>
       </div>
-      <div class="content-body">
-        <section class="all-categories">
+      <div className="content-body">
+        <section className="all-categories">
 
           {
           categories.length >0 
