@@ -1,11 +1,45 @@
 import { NavLink } from "react-router-dom";
 import CategoriesItem from "../../component/cms/CategoriesItem";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import categoriesApiController from "../../../controller/categories-api-controller";
+import { CategoriesActions } from "../../../redux/slices/categories-slice";
+import { useEffect } from "react";
+import AuthApiController from "../../../controller/auth-api-controller";
 
 let Categories = () => {
 
 let categories = useSelector((state)=>(state.categories.data));
-  return (
+ let dispatch = useDispatch();
+
+// let fetchCategories = async() =>{
+//  let response = await new categoriesApiController().read();
+//  dispatch(CategoriesActions.read(response.data));
+// };
+
+// useEffect( ()=>{
+//   fetchCategories();
+// }, [] );
+
+useEffect(() => {
+  const fetchCategories = async () => {
+    try {
+      let loginTest= await new AuthApiController().login(
+        "rawan@exa.com",
+        "1234566");
+      console.log("Login response:", loginTest);
+      const response = await new categoriesApiController().read();
+      console.log("API response:", response);
+      dispatch(CategoriesActions.read(response));
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+    }
+  };
+  fetchCategories();
+}, [dispatch]);
+
+
+
+return (
     <section className="content">
       <div className="content-header">
         <span>All Categories</span>
@@ -16,11 +50,11 @@ let categories = useSelector((state)=>(state.categories.data));
           <NavLink className="header-button" to="/cms/categories/new">
             Create New Category
           </NavLink>
-        </div>
+        </div> 
       </div>
       <div className="content-body">
         <section className="all-categories">
-
+{/* 
           {
           categories.length >0 
           ?
@@ -29,7 +63,15 @@ let categories = useSelector((state)=>(state.categories.data));
           )) 
           :
           <p>No categories found</p>
-          }
+          } */}
+
+          {Array.isArray(categories) && categories.length > 0 ? (
+            categories.map((element) => (
+              <CategoriesItem key={element.id} data={element} />
+            ))
+          ) : (
+            <p>No categories found</p>
+          )} 
         </section>
       </div>
     </section>

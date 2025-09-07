@@ -23,8 +23,11 @@ let cheackData=()=>{
   alert("All fields are required");
   return false;
 };
+
+
+
 let getBlog=()=>{
-return new Blog(
+const blog= new Blog(
   Date.now().toString(),
   titleRef.current.value,
   PublisherNameRef.current.value,
@@ -32,6 +35,18 @@ return new Blog(
   ImageRef.current.value,
   DescriptionRef.current.value
 );
+
+  // transform  plain object to flex before Redux
+
+return {
+    id: blog._id,
+    title: blog._title,
+    publisherName: blog._publisherName,
+    categoryId: blog._categoryId.toString(),
+    image: blog.image,
+    description: blog._description
+  };
+
 };
 
 let clear=()=>{
@@ -45,6 +60,8 @@ let clear=()=>{
   let onSubmitHandler = (event) => {
   event.preventDefault();
   if(cheackData()){
+    
+  //  new blog object  
 let blog = getBlog();
   dispatch(blogsActions.create(blog));
        clear(); 
@@ -95,8 +112,8 @@ let blog = getBlog();
                     ref={CategoryRef}
                   >
                     {categories.map((element) => (
-                      <option key={element._id} value={element._id}>
-                        {element._title}
+                      <option key={element.id} value={element.id}>
+                        {element.name}
                       </option>
                     ))}
                   </select>

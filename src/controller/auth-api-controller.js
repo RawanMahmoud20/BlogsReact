@@ -1,4 +1,5 @@
 import axios from "axios"
+import ApiResponse from "../models/ApiResponse";
 
 class AuthApiController {
     #errorResponse=()=> new ApiResponse("something went wrong , try again", false);
@@ -8,11 +9,12 @@ class AuthApiController {
         axios.defaults.baseURL = "http://localhost:8000";
         
         try {
-          let response = axios.get(`/csrf-cookie`, {
-          headers: {
-            Accept: "application/json"
-          },
+         let response = await axios.get(`/csrf-token`, {
+          withCredentials: true,
+          headers: { Accept: "application/json" },
         });
+            localStorage.setItem("csrfToken", response.data.csrfToken);
+
         return response.status == 200;
         } catch (error) {
        return this.#errorResponse();
@@ -20,18 +22,33 @@ class AuthApiController {
         }
         
     }
-   login =async ()=> {
+   login =async (email, password )=> {
       let cookiesRequest = await this.requestCsrfToken();
+
       if(cookiesRequest){
         try {
-           let response = await axios.post(`/api/v1/auth/login`);
-            if(response.status == 200){
-             localStorage.setItem("logged_in", true);
-            // return true;
+           let response = await axios.post(`/api/v1/auth/login`, {
+             email:email,
+             password:password,
+           },
+          {
+            withCredentials: true,
+            headers: {
+              "X-CSRF-Token": localStorage.getItem("csrfToken"),
+              Accept: "application/json",
+            },
+          });
+          if (response.status == 200) {
+            localStorage.setItem("logged_in", true);
+            // بعد الـ login
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("csrfToken", response.data.csrfToken);
+
+             // return true;
             }
-            return new ApiResponse(
-              response.data["message"], 
-              response.status == 200
+           return new ApiResponse(
+              response.data.message || "login successful",
+              response.status === 200
             );
           //  return response.status == 200;
         } catch (error) {
@@ -74,3 +91,5 @@ class AuthApiController {
 // }
 
    }
+
+ export default AuthApiController;

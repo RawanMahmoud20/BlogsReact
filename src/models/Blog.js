@@ -2,14 +2,17 @@ class Blog{
   #id;
   #title;
   #publisherName;
-  #description;
+  #categoryId;
   #image;
-   #categoryId;
+  #description;
+  
 
-  constructor(id, title, publisherName, description ,image, categoryId) {
+  constructor(id, title, publisherName, categoryId ,image, description) {
     this.#id = id;
     this.#title = title;
-        this.#publisherName = publisherName;
+    this.#publisherName = publisherName;
+    this.#categoryId = categoryId;
+    this.#image = image;
     this.#description = description;
 
     this.#image = image;

@@ -2,12 +2,14 @@ import { useRef } from "react";
 import Blog from "../../../models/Blog";
 import { CategoriesActions } from "../../../redux/slices/categories-slice";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 let EditCategory = () => {
 
   let titleRef=useRef();
   let briefInfoRef=useRef();
   let dispatch=useDispatch();
+   let navigate = useNavigate(); 
 let onSubmitHandler=(event)=>{
   event.preventDefault();
   if(cheackData()){
@@ -43,6 +45,10 @@ let clear=()=>{
   briefInfoRef.current.value = "";
 
 };
+
+ let cancelHandler = () => {
+    navigate("/cms/categories"); // <-- زر كانسل يذهب للكاتيجوريز
+  };
   return (
     <section className="content">
       <div className="content-header">
@@ -112,7 +118,7 @@ let clear=()=>{
               </section> */}
             </div>
             <div className="create-item_form_actions">
-              <button className="form-action" type="reset">
+              <button className="form-action" type="button" onClick={cancelHandler}>
                 Cancel
               </button>
               <button className="form-action done-action" type="submit">

@@ -19,13 +19,20 @@ let categoriesSlice = createSlice({
    },
    delete(state, action) {
     let filteredData=state.data.filter(
-      (element)=>element._id !== action.payload
+      (element)=>element.id !== action.payload
     );
      state.data = filteredData;
    },
-   read(state, action) {
-     state.data = action.payload;
-   },
+read(state, action) {
+  // action.payload صار array من objects
+  if (Array.isArray(action.payload)) {
+    state.data = action.payload;
+  } else {
+    state.data = [];
+  }
+}
+
+
   },
 });
 

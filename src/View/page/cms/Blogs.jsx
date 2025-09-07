@@ -22,15 +22,15 @@ let Blogs = () => {
           <table>
             <thead>
               <tr>
+                <th>Blog Title</th>
+                <th>Publisher Name</th>
                 <th>Category</th>
-                <th>Blog title</th>
-                <th>Due date</th>
-                <th>Publisher</th>
-                <th>Action</th>
+                <th>Imag</th>
+                <th>Description</th>
               </tr>
             </thead>
             <tbody>
-            {data && data.length > 0 ? (
+            {data.length > 0 ? (
               data.map((element) => (
                 <BlogRow key={element.id} blog={element} />
               ))
